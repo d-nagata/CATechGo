@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
@@ -17,8 +19,8 @@ func main() {
 func realMain() error {
 	// config values
 	const (
-		defaultPort   = ":8080"
-		defaultDBPath = ".sqlite3/todo.db"
+		defaultPort   = ":3306"
+		defaultDBPath = "root:basket0629@tcp(localhost:3306)/CATechGo"
 	)
 
 	port := os.Getenv("PORT")
@@ -38,10 +40,16 @@ func realMain() error {
 		return err
 	}
 
-	db, err := sql.Open("mysql", "root:basket0629@(localhost:3306)/CATechGo")
+	db, err := sql.Open("mysql", dbPath)
+	defer db.Close()
 	if err != nil {
 		return err
 	}
 	err = db.Ping()
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		log.Println("データベース接続完了")
+	}
 	return err
 }
