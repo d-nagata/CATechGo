@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/ikalemmon/CATechGo/service/auth"
 )
 
 type UserService struct {
@@ -18,24 +19,6 @@ func NewUserService(db *sql.DB) *UserService {
 	return &UserService{
 		db: db,
 	}
-}
-
-func CreateToken(userID string) (string, error) {
-	// tokenの作成
-	token := jwt.New(jwt.GetSigningMethod("HS256"))
-
-	// claimsの設定
-	token.Claims = jwt.MapClaims{
-		"user": userID,
-	}
-
-	// 署名
-	var secretKey = "secret" // 秘密鍵
-	tokenString, err := token.SignedString([]byte(secretKey))
-	if err != nil {
-		return "", err
-	}
-	return tokenString, nil
 }
 
 func (s *UserService) CreateUser(ctx context.Context, name string) (string, error) {
@@ -54,7 +37,39 @@ func (s *UserService) CreateUser(ctx context.Context, name string) (string, erro
 	}
 
 	//トークン作成
-	token, err = CreateToken(id)
+	token, err = auth.CreateToken(id)
 
 	return token, err
+}
+
+func (s *UserService) GetUser(ctx context.Context, tokenString string) (string, error) {
+	const (
+		read = `SELECT name FROM users where id = ?`
+	)
+	var name = ""
+
+	//トークン読み取り
+	token, err := auth.VerifyToken(tokenString)
+	if err != nil {
+		return "", err
+	}
+	claims := token.Claims.(jwt.MapClaims)
+	id := claims["id"]
+
+	stmt, err := s.db.PrepareContext(ctx, read)
+	if err != nil {
+		return "", err
+	}
+	defer stmt.Close()
+	row, err := stmt.QueryContext(ctx, id)
+	if err != nil {
+		return "", err
+	}
+	defer row.Close()
+
+	if err := row.Scan(name); err != nil {
+		return "", err
+	}
+
+	return name, err
 }
