@@ -3,10 +3,12 @@ package main
 import (
 	"database/sql"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/ikalemmon/CATechGo/handler/router"
 )
 
 func main() {
@@ -19,7 +21,7 @@ func main() {
 func realMain() error {
 	// config values
 	const (
-		defaultPort   = ":3306"
+		defaultPort   = ":8080"
 		defaultDBPath = "root:basket0629@tcp(localhost:3306)/CATechGo"
 	)
 
@@ -45,11 +47,14 @@ func realMain() error {
 	if err != nil {
 		return err
 	}
-	err = db.Ping()
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		log.Println("データベース接続完了")
-	}
-	return err
+	// err = db.Ping()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// } else {
+	// 	log.Println("データベース接続完了")
+	// }
+	// return err
+	mux := router.NewRouter(db)
+	http.ListenAndServe(port, mux)
+	return nil
 }
