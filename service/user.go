@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/ikalemmon/CATechGo/model"
 	"github.com/ikalemmon/CATechGo/service/auth"
 )
 
@@ -72,4 +73,33 @@ func (s *UserService) GetUser(ctx context.Context, tokenString string) (string, 
 	}
 
 	return name, err
+}
+
+func (s *UserService) UpdateUser(ctx context.Context, tokenString string, name string) error {
+	const (
+		update = `UPDATE users SET name = ? WHERE id = ?`
+	)
+
+	//トークン読み取り
+	token, err := auth.VerifyToken(tokenString)
+	if err != nil {
+		return err
+	}
+	claims := token.Claims.(jwt.MapClaims)
+	id := claims["id"]
+
+	res, err := s.db.ExecContext(ctx, update, name, id)
+	if err != nil {
+		return err
+	}
+
+	row, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if row == 0 {
+		return model.Run()
+	}
+
+	return nil
 }

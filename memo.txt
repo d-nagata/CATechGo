@@ -23,3 +23,9 @@ name:string
 トークンの保持方法→リクエストのヘッダに保存できるみたい。(req.Header.Set("Authorization",トークン))
 https://qiita.com/akubi0w1/items/dee1000699a3e9d9b2e3
 秘密鍵の保管場所→書き込んじゃった。本当は環境変数とかに設定する方がいい。
+
+・取得時の処理
+リクエストヘッダに書かれたtokenを取得する。リクエストヘッダのAuthorization:Bearerに保存されている。
+
+・更新時の処理
+特になし
