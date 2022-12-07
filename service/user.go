@@ -24,7 +24,7 @@ func NewUserService(db *sql.DB) *UserService {
 
 func (s *UserService) CreateUser(ctx context.Context, name string) (string, error) {
 	const (
-		insert = `INSERT INTO users(name, id) VALUES (?,?)`
+		insert = `INSERT INTO users(name, userid) VALUES (?,?)`
 	)
 	var token = ""
 

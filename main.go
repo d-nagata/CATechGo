@@ -22,7 +22,7 @@ func realMain() error {
 	// config values
 	const (
 		defaultPort   = ":8080"
-		defaultDBPath = "root:jup1ter04@tcp(localhost:3306)/CATechGo"
+		defaultDBPath = "root:jup1ter04@tcp(localhost:3306)/CAGo"
 	)
 
 	port := os.Getenv("PORT")
